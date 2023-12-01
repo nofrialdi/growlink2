@@ -24,6 +24,9 @@ export default function Home() {
 	const router = useRouter();
 	const [yields, setYields] = useState<Yield[]>([]);
 	const [transactions, setTransactions] = useState<Transaction[]>([]);
+	const [totalIncome, setTotalIncome] = useState(0);
+	const [totalExpense, setTotalExpense] = useState(0);
+	const [totalBalance, setTotalBalance] = useState(0);
 
 	async function getUser() {
 		const response = await fetch(`${process.env.NEXT_PUBLIC_SERVICE_BASE}/user/me`, {
@@ -71,11 +74,76 @@ export default function Home() {
 		}
 	}
 
+	async function transactionExpense() {
+		try {
+			const response = await fetch(
+				`${process.env.NEXT_PUBLIC_SERVICE_BASE}/transactions?type=EXPENSE`,
+				{
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+					},
+				}
+			);
+			const data = await response.json();
+		} catch (error) {
+			console.log(error);
+		}
+	}
+
+	const formatToRupiah = (amount: number) => {
+		const formatter = new Intl.NumberFormat("id-ID", {
+			style: "currency",
+			currency: "IDR",
+			minimumFractionDigits: 0,
+		});
+
+		return formatter.format(amount).replace("IDR", "Rp. ");
+	};
+
+	const calculateExpense = (transactions: Transaction[]) => {
+		let totalExpense = 0;
+
+		transactions.forEach((transaction) => {
+			if (transaction.type === "EXPENSE") {
+				totalExpense += transaction.amount;
+			}
+		});
+		setTotalExpense(totalExpense);
+		console.log(totalExpense);
+	};
+
+	const calculateIncome = (transactions: Transaction[]) => {
+		let totalIncome = 0;
+
+		transactions.forEach((transaction) => {
+			if (transaction.type === "INCOME") {
+				totalIncome += transaction.amount;
+			}
+		});
+		setTotalIncome(totalIncome);
+		console.log(totalIncome);
+	};
+
+	const calculateBalance = (totalIncome: number, totalExpense: number) => {
+		const totalBalance = totalIncome - totalExpense;
+
+		setTotalBalance(totalBalance);
+	};
+
 	useEffect(() => {
 		getUser();
 		getYields();
 		getTransactions();
+		transactionExpense();
 	}, []);
+
+	useEffect(() => {
+		calculateExpense(transactions);
+		calculateIncome(transactions);
+		calculateBalance(totalIncome, totalExpense);
+	}, [transactions]);
 
 	return (
 		<Container
@@ -120,9 +188,16 @@ export default function Home() {
 					<Typography variant="caption" component="p">
 						Total Saldo
 					</Typography>
-					<Typography variant="h4" component="h5">
-						Rp 1000.000
-					</Typography>
+
+					{totalBalance < 0 ? (
+						<Typography variant="h4" component="h4" sx={{ color: "error.main" }}>
+							- {formatToRupiah(Math.abs(totalBalance))}
+						</Typography>
+					) : (
+						<Typography variant="h4" component="h4" sx={{ color: "success.main" }}>
+							{formatToRupiah(totalBalance)}
+						</Typography>
+					)}
 				</Paper>
 
 				{/* PENGELUARAN */}
@@ -152,7 +227,7 @@ export default function Home() {
 							Total Pemasukan
 						</Typography>
 						<Typography variant="h6" component="h6" sx={{ color: "success.main" }}>
-							+ Rp 2000.000
+							+ {formatToRupiah(totalIncome)}
 						</Typography>
 					</Paper>
 
@@ -173,7 +248,7 @@ export default function Home() {
 							Total Pengeluaran
 						</Typography>
 						<Typography variant="h6" component="h6" sx={{ color: "error.main" }}>
-							- Rp 1000.000
+							- {formatToRupiah(totalExpense)}
 						</Typography>
 					</Paper>
 				</Box>

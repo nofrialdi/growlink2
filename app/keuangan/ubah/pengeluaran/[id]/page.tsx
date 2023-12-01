@@ -47,13 +47,13 @@ export default function Page({ params }: { params: { id: string } }) {
 	const [active, setActive] = useState("");
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [selectedCategory, setSelectedCategory] = useState("");
-	const [transactionCategory, setTransactionCategory] = useState<TransactionCategory[]>([]);
+	const [transactionCategories, setTransactionCategories] = useState<TransactionCategory[]>([]);
 	const [amount, setAmount] = useState(0);
 	const [description, setDescription] = useState("");
 	const [transactionTime, setTransactionTime] = useState("");
 	const [selectedTransactionTime, setSelectedTransactionTime] = useState(new Date(transactionTime));
 	const [selectedTransactionDate, setSelectedTransactionDate] = useState<Dayjs | null>(null);
-	const [categoryId, setCategoryId] = useState("");
+	const [transactionCategoryId, setTransactionCategoryId] = useState("");
 
 	const handleOpenModal = () => {
 		setIsModalOpen(true);
@@ -65,7 +65,7 @@ export default function Page({ params }: { params: { id: string } }) {
 
 	const handleChange = (event: SelectChangeEvent) => {
 		setSelectedCategory(event.target.value as string);
-		setCategoryId(event.target.value as string);
+		setTransactionCategoryId(event.target.value as string);
 	};
 
 	const handleTransactionDateChange = (date: any) => {
@@ -85,7 +85,7 @@ export default function Page({ params }: { params: { id: string } }) {
 				}
 			);
 			const data = await response.json();
-			setTransactionCategory(data);
+			setTransactionCategories(data);
 		} catch (error) {
 			console.log(error);
 		}
@@ -162,33 +162,6 @@ export default function Page({ params }: { params: { id: string } }) {
 		getTransaction();
 	}, [params.id]);
 
-	// const handelSubmitPengeluaran = async (event: React.FormEvent<HTMLFormElement>) => {
-	// 	event.preventDefault();
-	// 	try {
-	// 		const response = await axios.patch(
-	// 			`${process.env.NEXT_PUBLIC_SERVICE_BASE}/transactions/${params.id}`,
-	// 			{
-	// 				amount: amount,
-	// 				description: description,
-	// 				transactionTime: transactionTime,
-	// 				transactionCategory: {
-	// 					id: categoryId,
-	// 					name: selectedCategory,
-	// 				},
-	// 			},
-	// 			{
-	// 				headers: {
-	// 					Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-	// 				},
-	// 			}
-	// 		);
-	// 		console.log(response.data);
-	// 		toast.success("Pengeluaran Berhasil");
-	// 	} catch (error) {
-	// 		console.log(error);
-	// 	}
-	// };
-
 	const updateDataPengeluaran = async (id: string, data: any) => {
 		let response = null;
 		let bearer = "";
@@ -210,9 +183,6 @@ export default function Page({ params }: { params: { id: string } }) {
 						amount: data.amount,
 						description: data.description,
 						transactionTime: data.transactionTime,
-						transactionCategory: {
-							name: selectedCategory,
-						},
 					};
 
 					const response = await axios.patch(
@@ -245,8 +215,6 @@ export default function Page({ params }: { params: { id: string } }) {
 		});
 
 		data.transactionTime = selectedTransactionDate;
-		data.amout = amount;
-		data.transactionCategory = selectedCategory;
 
 		try {
 			const res: any = await updateDataPengeluaran(params.id, data);
@@ -392,9 +360,9 @@ export default function Page({ params }: { params: { id: string } }) {
 							labelId="categorySelected"
 							label="Category"
 						>
-							{transactionCategory?.map((category) => (
-								<MenuItem key={category.id} value={category.name}>
-									{category.name}
+							{transactionCategories?.map((transactionCategory) => (
+								<MenuItem key={transactionCategory.id} value={transactionCategory.name}>
+									{transactionCategory.name}
 								</MenuItem>
 							))}
 						</Select>

@@ -21,6 +21,7 @@ import { Transaction } from "@/app/interfaces/interface";
 import { useDrawingArea } from "@mui/x-charts/hooks";
 import { styled } from "@mui/material/styles";
 import { FiberManualRecord } from "@mui/icons-material";
+import FilterKeuangan from "../components/FilterKeuangan";
 
 interface Categories {
   id: number;
@@ -32,10 +33,18 @@ export default function Page() {
 
   // TRANSACTIONS
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [selectedType, setSelectedType] = useState("");
+
   async function getTransactions() {
+    const allTransactionUrl =
+      process.env.NEXT_PUBLIC_SERVICE_BASE + "/transactions";
+    const filteredTransactionUrl =
+      process.env.NEXT_PUBLIC_SERVICE_BASE +
+      "/transactions?type=" +
+      selectedType;
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVICE_BASE}/transactions`,
+        selectedType == "" ? allTransactionUrl : filteredTransactionUrl,
         {
           method: "GET",
           headers: {
@@ -128,6 +137,9 @@ export default function Page() {
 
   useEffect(() => {
     getTransactions();
+  }, []);
+
+  useEffect(() => {
     getCategories();
   }, []);
   return (
@@ -155,12 +167,19 @@ export default function Page() {
           <Button variant="text" sx={{ color: "#ffffff" }}>
             Keuangan
           </Button>
-          <IconButton
+
+          <FilterKeuangan
+            selectedType={selectedType}
+            setSelectedType={setSelectedType}
+            getTransactions={getTransactions}
+          />
+
+          {/* <IconButton
             sx={{ color: "#ffffff" }}
             onClick={() => (window.location.href = "/keuangan/histori/filter")}
           >
             <TuneIcon />
-          </IconButton>
+          </IconButton> */}
         </Container>
       </Paper>
 

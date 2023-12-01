@@ -153,7 +153,7 @@ export default function Pertanian() {
 
   function calculatePercentage(value: number, total: number): number {
     const result = (value / total) * 100;
-    return parseFloat(result.toFixed(1)); // Mengubah kembali hasil ke tipe number
+    return parseFloat(result.toFixed(1));
   }
 
   const combineData = (data: Yields[]) => {
@@ -175,7 +175,6 @@ export default function Pertanian() {
       color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
     }));
   };
-  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -220,13 +219,11 @@ export default function Pertanian() {
     });
     setTotalQuantity(total);
 
-    // Combine data and update 'statisticData'
     const combinedData = combineData(yields);
     setStatisticData(combinedData);
   }, [yields]);
 
   return (
-    // ALL
     <Box
       sx={{ display: "flex", alignItems: "center", flexDirection: "column" }}
     >

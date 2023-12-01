@@ -150,140 +150,160 @@ export default function Pertanian() {
 	const [quantityProduct, setQuantityProduct] = useState(0);
 	const calculateQuantity = (productId: number) => {};
 
-	return (
-		// ALL
-		<Box sx={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
-			<Paper
-				square
-				sx={{
-					bgcolor: "primary.main",
-					width: "100vw",
-					zIndex: 50,
-					position: "fixed",
-				}}
-			>
-				<Container maxWidth={"sm"} sx={{ display: "flex", justifyContent: "space-between" }}>
-					<Button
-						onClick={() => router.push("/home")}
-						startIcon={<ArrowBackIosNewIcon />}
-						variant="text"
-						sx={{ color: "#ffffff" }}
-					>
-						Pertanian
-					</Button>
-				</Container>
-			</Paper>
+	function calculatePercentage(value: number, total: number): number {
+    const result = (value / total) * 100;
+    return parseFloat(result.toFixed(1)); // Mengubah kembali hasil ke tipe number
+  }
 
-			<Box
-				maxWidth={"sm"}
-				sx={{
-					width: "100%",
-					display: "flex",
-					justifyContent: "center",
-					flexDirection: "column",
-				}}
-			>
-				<Box sx={{ width: "100%", typography: "body1", mt: 6 }}>
-					<TabContext value={value}>
-						<Box borderBottom={1} borderColor={"divider"}>
-							<TabList
-								centered
-								onChange={handleChange}
-								aria-label="lab API tabs example"
-								variant="fullWidth"
-							>
-								<Tab label="Statistik" value="1" />
-								<Tab label="History" value="2" />
-								<Tab label="Pantau" value="3" />
-							</TabList>
-						</Box>
-						<TabPanel value="1">
-							<Stack
-								direction={"column"}
-								gap={2}
-								padding={2}
-								width={1}
-								height={1}
-								maxWidth={"sm"}
-								paddingBottom={10}
-								overflow={"scroll"}
-							>
-								<Paper
-									sx={{
-										backgroundColor: "#ffffff",
-										height: "fit",
-										display: "flex",
-										alignItems: "center",
-										justifyContent: "center",
-										flexDirection: "column",
-										borderRadius: 2,
-										paddingX: 4,
-										paddingY: 8,
-									}}
-								>
-									<PieChart
-										series={[
-											{
-												data: statisticData,
-												innerRadius: 80,
-											},
-										]}
-										legend={{ hidden: true }}
-										width={400}
-										height={200}
-										margin={{ right: 5 }}
-									>
-										<PieCenterLabel>{totalQuantity} Kg</PieCenterLabel>
-									</PieChart>
-								</Paper>
-								{statisticData.map(
-									(data) =>
-										data.id > 0 && (
-											<Paper key={data.id} sx={{ display: "flex" }}>
-												<Box
-													sx={{
-														backgroundColor: data.color,
-														width: 5,
-														borderTopLeftRadius: 4,
-														borderBottomLeftRadius: 4,
-													}}
-												/>
-												<Stack padding={2}>
-													<Typography variant="body1">{data.label}</Typography>
-													<Typography variant="caption">{data.value}%</Typography>
-												</Stack>
-												<Stack marginLeft={"auto"} marginRight={2} justifyContent={"center"}>
-													<Typography variant="body1" color={"error"}>
-														{data.value}
-													</Typography>
-												</Stack>
-											</Paper>
-										)
-								)}
-							</Stack>
-						</TabPanel>
+  return (
+    // ALL
+    <Box
+      sx={{ display: "flex", alignItems: "center", flexDirection: "column" }}
+    >
+      <Paper
+        square
+        sx={{
+          bgcolor: "primary.main",
+          width: "100vw",
+          zIndex: 50,
+          position: "fixed",
+        }}
+      >
+        <Container
+          maxWidth={"sm"}
+          sx={{ display: "flex", justifyContent: "space-between" }}
+        >
+          <Button
+            onClick={() => router.push("/home")}
+            startIcon={<ArrowBackIosNewIcon />}
+            variant="text"
+            sx={{ color: "#ffffff" }}
+          >
+            Pertanian
+          </Button>
+        </Container>
+      </Paper>
 
-						<TabPanel value="2">
-							<Stack gap={3}>
-								{yields?.map(
-									(yields, index) =>
-										yields.quantity > 0 && <PertanianCard key={index} yields={yields} />
-								)}
-							</Stack>
-						</TabPanel>
-						<TabPanel value="3">
-							<Stack gap={3}>
-								{yields?.map(
-									(yields, index) =>
-										yields.quantity == 0 &&
-										!yields.isHarvested && <PertanianCard key={index} yields={yields} />
-								)}
-							</Stack>
-						</TabPanel>
-					</TabContext>
-				</Box>
-			</Box>
-			<Navigation />
-		</Box>
-	);
+      <Box
+        maxWidth={"sm"}
+        sx={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "center",
+          flexDirection: "column",
+        }}
+      >
+        <Box sx={{ width: "100%", typography: "body1", mt: 6 }}>
+          <TabContext value={value}>
+            <Box borderBottom={1} borderColor={"divider"}>
+              <TabList
+                centered
+                onChange={handleChange}
+                aria-label="lab API tabs example"
+                variant="fullWidth"
+              >
+                <Tab label="Statistik" value="1" />
+                <Tab label="History" value="2" />
+                <Tab label="Pantau" value="3" />
+              </TabList>
+            </Box>
+            <TabPanel value="1">
+              <Stack
+                direction={"column"}
+                gap={2}
+                padding={2}
+                width={1}
+                height={1}
+                maxWidth={"sm"}
+                paddingBottom={10}
+                overflow={"scroll"}
+              >
+                <Paper
+                  sx={{
+                    backgroundColor: "#ffffff",
+                    height: "fit",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexDirection: "column",
+                    borderRadius: 2,
+                    paddingX: 4,
+                    paddingY: 8,
+                  }}
+                >
+                  <PieChart
+                    series={[
+                      {
+                        data: statisticData,
+                        innerRadius: 80,
+                      },
+                    ]}
+                    legend={{ hidden: true }}
+                    width={400}
+                    height={200}
+                    margin={{ right: 5 }}
+                  >
+                    <PieCenterLabel>{totalQuantity} Kg</PieCenterLabel>
+                  </PieChart>
+                </Paper>
+                {statisticData.map(
+                  (data) =>
+                    data.id > 0 && (
+                      <Paper key={data.id} sx={{ display: "flex" }}>
+                        <Box
+                          sx={{
+                            backgroundColor: data.color,
+                            width: 5,
+                            borderTopLeftRadius: 4,
+                            borderBottomLeftRadius: 4,
+                          }}
+                        />
+                        <Stack padding={2}>
+                          <Typography variant="body1">{data.label}</Typography>
+                          <Typography variant="caption">
+                            {calculatePercentage(data.value, totalQuantity)}%
+                          </Typography>
+                        </Stack>
+                        <Stack
+                          marginLeft={"auto"}
+                          marginRight={2}
+                          justifyContent={"center"}
+                        >
+                          <Typography variant="body1" color={"error"}>
+                            {data.value}
+                          </Typography>
+                        </Stack>
+                      </Paper>
+                    )
+                )}
+              </Stack>
+            </TabPanel>
+
+            <TabPanel value="2">
+              <Stack gap={3}>
+                {yields?.map(
+                  (yields, index) =>
+                    yields.quantity > 0 && (
+                      <PertanianCard key={index} yields={yields} />
+                    )
+                )}
+              </Stack>
+            </TabPanel>
+            <TabPanel value="3">
+              <Stack gap={3}>
+                {yields?.map(
+                  (yields, index) =>
+                    yields.quantity == 0 &&
+                    !yields.isHarvested && (
+                      <PertanianCard key={index} yields={yields} />
+                    )
+                )}
+              </Stack>
+            </TabPanel>
+          </TabContext>
+        </Box>
+      </Box>
+      <Navigation />
+    </Box>
+  );
 }

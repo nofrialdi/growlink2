@@ -168,12 +168,14 @@ export default function Pertanian() {
       }
     });
 
-    return Object.keys(combinedData).map((label) => ({
+    return Object.keys(combinedData).map((label, index) => ({
+      id: index,
       label,
       value: combinedData[label],
       color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
     }));
   };
+  
 
   useEffect(() => {
     const fetchData = async () => {

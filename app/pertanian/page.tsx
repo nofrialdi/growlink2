@@ -53,107 +53,176 @@ export default function Pertanian() {
 	const currentDate = new Date();
 
 	const [totalQuantity, setTotalQuantity] = useState(0);
-	const colors = [
-		"#8dd3c7",
-		"#ffffb3",
-		"#bebada",
-		"#fb8072",
-		"#80b1d3",
-		"#fdb462",
-		"#b3de69",
-		"#fccde5",
-		"#d9d9d9",
-		"#bc80bd",
-		"#ccebc5",
-		"#ffed6f",
-		"#aaffc3",
-		"#f984ef",
-	];
+	const [statisticData, setStatisticData] = useState<any[]>([]);
+  console.log(statisticData);
 
-	const handleChange = (event: React.SyntheticEvent, newValue: string) => {
-		setValue(newValue);
-	};
+  const colors = [
+    "#8dd3c7",
+    "#ffffb3",
+    "#bebada",
+    "#fb8072",
+    "#80b1d3",
+    "#fdb462",
+    "#b3de69",
+    "#fccde5",
+    "#d9d9d9",
+    "#bc80bd",
+    "#ccebc5",
+    "#ffed6f",
+    "#aaffc3",
+    "#f984ef",
+  ];
 
-	async function getProducts() {
-		try {
-			const response = await fetch(`${process.env.NEXT_PUBLIC_SERVICE_BASE}/yields/products`, {
-				method: "GET",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-				},
-			});
-			const data = await response.json();
-			setProducts(data);
-		} catch (error) {
-			console.log(error);
-		}
-	}
+  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+    setValue(newValue);
+  };
 
-	async function getYields() {
-		try {
-			const response = await fetch(`${process.env.NEXT_PUBLIC_SERVICE_BASE}/yields`, {
-				method: "GET",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-				},
-			});
-			const data = await response.json();
-			setYields(data);
-		} catch (error) {
-			console.log(error);
-		}
-	}
+  async function getProducts() {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVICE_BASE}/yields/products`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      const data = await response.json();
+      setProducts(data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
-	useEffect(() => {
-		getProducts();
-		getYields();
-	}, []);
+  async function getYields() {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVICE_BASE}/yields`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      const data = await response.json();
+      setYields(data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
-	function PieCenterLabel({ children }: { children: React.ReactNode }) {
-		const { width, height, left, top } = useDrawingArea();
-		return (
-			<StyledText x={left + width / 2} y={top + height / 2}>
-				{children}
-			</StyledText>
-		);
-	}
+  useEffect(() => {
+    getProducts();
+    getYields();
+  }, []);
 
-	const StyledText = styled("text")(({ theme }) => ({
-		fill: theme.palette.text.primary,
-		textAnchor: "middle",
-		dominantBaseline: "central",
-		fontSize: 14,
-		fontWeight: "bold",
-	}));
+  function PieCenterLabel({ children }: { children: React.ReactNode }) {
+    const { width, height, left, top } = useDrawingArea();
+    return (
+      <StyledText x={left + width / 2} y={top + height / 2}>
+        {children}
+      </StyledText>
+    );
+  }
 
-	const statisticData = yields.map((yields, index) => ({
-		id: index,
-		value: yields.quantity,
-		label: `${yields.product.name}`,
-		color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
-	}));
+  const StyledText = styled("text")(({ theme }) => ({
+    fill: theme.palette.text.primary,
+    textAnchor: "middle",
+    dominantBaseline: "central",
+    fontSize: 14,
+    fontWeight: "bold",
+  }));
 
-	const calculateTotalQuantity = () => {
-		let total = 0;
-		yields.forEach((yieldData) => {
-			total += yieldData.quantity;
-		});
-		setTotalQuantity(total);
-	};
+  const calculateTotalQuantity = () => {
+    let total = 0;
+    yields.forEach((yieldData) => {
+      total += yieldData.quantity;
+    });
+    setTotalQuantity(total);
+  };
 
-	useEffect(() => {
-		calculateTotalQuantity();
-	}, [yields]);
+  useEffect(() => {
+    calculateTotalQuantity();
+  }, [yields]);
 
-	const [quantityProduct, setQuantityProduct] = useState(0);
-	const calculateQuantity = (productId: number) => {};
+  const [quantityProduct, setQuantityProduct] = useState(0);
+  const calculateQuantity = (productId: number) => {};
 
-	function calculatePercentage(value: number, total: number): number {
+  function calculatePercentage(value: number, total: number): number {
     const result = (value / total) * 100;
     return parseFloat(result.toFixed(1)); // Mengubah kembali hasil ke tipe number
   }
+
+  const combineData = (data: Yields[]) => {
+    const combinedData: { [label: string]: number } = {};
+
+    data.forEach((yieldData) => {
+      const label = yieldData.product.name;
+      if (combinedData[label]) {
+        combinedData[label] += yieldData.quantity;
+      } else {
+        combinedData[label] = yieldData.quantity;
+      }
+    });
+
+    return Object.keys(combinedData).map((label) => ({
+      label,
+      value: combinedData[label],
+      color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
+    }));
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const productsResponse = await fetch(
+          `${process.env.NEXT_PUBLIC_SERVICE_BASE}/yields/products`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+          }
+        );
+        const productsData = await productsResponse.json();
+        setProducts(productsData);
+
+        const yieldsResponse = await fetch(
+          `${process.env.NEXT_PUBLIC_SERVICE_BASE}/yields`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+          }
+        );
+        const yieldsData = await yieldsResponse.json();
+        setYields(yieldsData);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    let total = 0;
+    yields.forEach((yieldData) => {
+      total += yieldData.quantity;
+    });
+    setTotalQuantity(total);
+
+    // Combine data and update 'statisticData'
+    const combinedData = combineData(yields);
+    setStatisticData(combinedData);
+  }, [yields]);
 
   return (
     // ALL
@@ -248,7 +317,7 @@ export default function Pertanian() {
                 </Paper>
                 {statisticData.map(
                   (data) =>
-                    data.id > 0 && (
+                    data && (
                       <Paper key={data.id} sx={{ display: "flex" }}>
                         <Box
                           sx={{

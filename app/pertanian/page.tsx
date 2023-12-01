@@ -54,7 +54,6 @@ export default function Pertanian() {
 
 	const [totalQuantity, setTotalQuantity] = useState(0);
 	const [statisticData, setStatisticData] = useState<any[]>([]);
-  console.log(statisticData);
 
   const colors = [
     "#8dd3c7",
